@@ -113,6 +113,7 @@ INSERT INTO metrica_componente (nome, unidade_medida, especificacao) VALUES
     ('Disponível', 'GB',  'Quantidade livre'),
     ('Em uso',     'GB',  'Quantidade utilizada'),
     ('Download',   'MB',  'Dados recebidos'),
+    ('Rede', 'MB', 'Dados trafegados na rede'),
     ('Upload',     'MB',  'Dados enviados');
 
 INSERT INTO tipo_componente (nome, fk_metrica_componente) VALUES
@@ -126,12 +127,20 @@ INSERT INTO tipo_componente (nome, fk_metrica_componente) VALUES
     ('Disco', 3),
     ('Disco', 4),
     ('Disco', 5),
-    ('Rede',  6),
-    ('Rede',  7);
+	('Rede - Recebidos', 4),                                
+	('Rede - Enviados', 4);
 
 
 INSERT INTO componente (status_atividade, fk_tipo_componente)
 SELECT 1, id FROM tipo_componente;
+
+INSERT INTO configuracao_maquina (fk_maquina, fk_componente) VALUES
+(1, 1),  
+(1, 2),  
+(1, 3),
+(1, 5), 
+(1, 6),  
+(1, 7);
 
 -- SELECT para visualizar as capturas:
 SELECT c.id AS 'Número da Captura',
