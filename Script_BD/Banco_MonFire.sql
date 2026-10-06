@@ -10,20 +10,27 @@ CREATE TABLE empresa (
     nome_fantasia VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE cargo (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    funcao VARCHAR(50) NOT NULL
-);
-
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
     senha VARCHAR(50) NOT NULL,
     fk_empresa INT NOT NULL,
+    CONSTRAINT empresa_usuario FOREIGN KEY (fk_empresa) REFERENCES empresa(id)
+);
+
+CREATE TABLE cargo (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    funcao VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE usuario_cargo (
+    fk_usuario INT NOT NULL,
     fk_cargo INT NOT NULL,
-    CONSTRAINT empresa_usuario FOREIGN KEY (fk_empresa) REFERENCES empresa(id),
-    CONSTRAINT cargo_usuario FOREIGN KEY (fk_cargo) REFERENCES cargo(id)
+    saida DATETIME DEFAULT current_timestamp NOT NULL,
+    PRIMARY KEY (fk_usuario, fk_cargo),
+    CONSTRAINT fk_usuario_cargo_usuario FOREIGN KEY (fk_usuario) REFERENCES usuario(id),
+    CONSTRAINT fk_usuario_cargo_cargo FOREIGN KEY (fk_cargo) REFERENCES cargo(id)
 );
 
 CREATE TABLE maquina (
@@ -133,6 +140,14 @@ INSERT INTO tipo_componente (nome, fk_metrica_componente) VALUES
 
 INSERT INTO componente (status_atividade, fk_tipo_componente)
 SELECT 1, id FROM tipo_componente;
+
+INSERT INTO maquina (nome, fk_empresa) VALUES 
+	('Matheus Rocha', 2),
+    ('Mickaela Rodrigues', 2),
+    ('Raphael Oliveira', 2),
+    ('Felipe Dias', 2),
+    ('Enzo Valin', 2),
+    ('Beatriz Sarro', 2);
 
 INSERT INTO configuracao_maquina (fk_maquina, fk_componente) VALUES
 (1, 1),  
