@@ -104,9 +104,7 @@ CREATE TABLE alerta (
 
 -- INSERTS:
 INSERT INTO empresa (razao_social, cnpj, nome_fantasia) VALUES
-    ('Monitoramento de Hardaware Bombeiro LTDA', '01234567891234', 'MonFire'),
-    ('Sptech Educacao Executiva e Servicos Ltda', '26217610000135', 'São Paulo Tech School');
-
+    ('Monitoramento de Hardaware Bombeiro LTDA', '01234567891234', 'MonFire');
 
 INSERT INTO nivel_alerta (estado, descricao) VALUES
     ('Normal', 'Funcionamento dentro dos limites esperados'),
@@ -120,7 +118,7 @@ INSERT INTO metrica_componente (nome, unidade_medida, especificacao) VALUES
     ('Disponível', 'GB',  'Quantidade livre'),
     ('Em uso',     'GB',  'Quantidade utilizada'),
     ('Download',   'MB',  'Dados recebidos'),
-    ('Rede', 'MB', 'Dados trafegados na rede'),
+    ('Rede',       'MB',  'Dados trafegados na rede'),
     ('Upload',     'MB',  'Dados enviados');
 
 INSERT INTO tipo_componente (nome, fk_metrica_componente) VALUES
@@ -134,30 +132,30 @@ INSERT INTO tipo_componente (nome, fk_metrica_componente) VALUES
     ('Disco', 3),
     ('Disco', 4),
     ('Disco', 5),
-	('Rede - Recebidos', 4),                                
-	('Rede - Enviados', 4);
-
+    ('Rede - Recebidos', 6),
+    ('Rede - Enviados', 8);
 
 INSERT INTO componente (status_atividade, fk_tipo_componente)
 SELECT 1, id FROM tipo_componente;
 
-INSERT INTO maquina (nome, fk_empresa) VALUES 
-	('Matheus Rocha', 2),
-    ('Mickaela Rodrigues', 2),
-    ('Raphael Oliveira', 2),
-    ('Felipe Dias', 2),
-    ('Enzo Valin', 2),
-    ('Beatriz Sarro', 2);
+INSERT INTO maquina (nome, fk_empresa) VALUES
+    ('Maquina Servidor', 1);
 
 INSERT INTO configuracao_maquina (fk_maquina, fk_componente) VALUES
-(1, 1),  
-(1, 2),  
-(1, 3),
-(1, 5), 
-(1, 6),  
-(1, 7);
+    (1, 1),   -- id 1:  CPU Uso
+    (1, 2),   -- id 2:  CPU Frequência
+    (1, 3),   -- id 3:  RAM Uso
+    (1, 4),   -- id 4:  RAM Total
+    (1, 5),   -- id 5:  RAM Disponível
+    (1, 6),   -- id 6:  RAM Em uso
+    (1, 7),   -- id 7:  Disco Uso
+    (1, 8),   -- id 8:  Disco Total
+    (1, 9),   -- id 9:  Disco Disponível
+    (1, 10),  -- id 10: Disco Em uso
+    (1, 11),  -- id 11: Rede - Recebidos (Java)
+    (1, 12);  -- id 12: Rede - Enviados  (Java)
 
--- SELECT para visualizar as capturas:
+-- SELECT
 SELECT c.id AS 'Número da Captura',
        m.nome AS 'Máquina',
        t.nome AS 'Componente',
@@ -171,4 +169,4 @@ JOIN maquina m ON m.id = cm.fk_maquina
 JOIN componente comp ON comp.id = cm.fk_componente
 JOIN tipo_componente t ON t.id = comp.fk_tipo_componente
 JOIN metrica_componente mc ON mc.id = t.fk_metrica_componente
-ORDER BY c.dtHr;    
+ORDER BY c.id ASC;
