@@ -7,7 +7,7 @@ CREATE TABLE empresa (
     razao_social VARCHAR(50) NOT NULL,
     cnpj CHAR(14) NOT NULL,
     dtHr DATETIME DEFAULT current_timestamp NOT NULL,
-    nome_fantasia VARCHAR(50) NOT NULL
+    unidade VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE usuario (
@@ -27,7 +27,8 @@ CREATE TABLE cargo (
 CREATE TABLE usuario_cargo (
     fk_usuario INT NOT NULL,
     fk_cargo INT NOT NULL,
-    saida DATETIME DEFAULT current_timestamp NOT NULL,
+    ultimo_acesso DATETIME DEFAULT current_timestamp NOT NULL,
+    saida DATETIME DEFAULT current_timestamp,
     PRIMARY KEY (fk_usuario, fk_cargo),
     CONSTRAINT fk_usuario_cargo_usuario FOREIGN KEY (fk_usuario) REFERENCES usuario(id),
     CONSTRAINT fk_usuario_cargo_cargo FOREIGN KEY (fk_cargo) REFERENCES cargo(id)
@@ -36,6 +37,9 @@ CREATE TABLE usuario_cargo (
 CREATE TABLE maquina (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(50) NOT NULL,
+    ip INT NOT NULL,
+    SO VARCHAR(30),
+    uptime DATETIME DEFAULT current_timestamp NOT NULL,
     fk_empresa INT NOT NULL,
     CONSTRAINT empresa_maquina FOREIGN KEY (fk_empresa) REFERENCES empresa(id)
 );
@@ -103,7 +107,7 @@ CREATE TABLE alerta (
 );
 
 -- INSERTS:
-INSERT INTO empresa (razao_social, cnpj, nome_fantasia) VALUES
+INSERT INTO empresa (razao_social, cnpj, unidade) VALUES
     ('Monitoramento de Hardaware Bombeiro LTDA', '01234567891234', 'MonFire'),
     ('Sptech Educacao Executiva e Servicos Ltda', '26217610000135', 'São Paulo Tech School');
 
@@ -141,13 +145,8 @@ INSERT INTO tipo_componente (nome, fk_metrica_componente) VALUES
 INSERT INTO componente (status_atividade, fk_tipo_componente)
 SELECT 1, id FROM tipo_componente;
 
-INSERT INTO maquina (nome, fk_empresa) VALUES 
-	('Matheus Rocha', 2),
-    ('Mickaela Rodrigues', 2),
-    ('Raphael Oliveira', 2),
-    ('Felipe Dias', 2),
-    ('Enzo Valin', 2),
-    ('Beatriz Sarro', 2);
+INSERT INTO maquina (nome, fk_empresa,ip) VALUES 
+	('Maquina00', 2, 10101010);
 
 INSERT INTO configuracao_maquina (fk_maquina, fk_componente) VALUES
 (1, 1),  
@@ -171,4 +170,4 @@ JOIN maquina m ON m.id = cm.fk_maquina
 JOIN componente comp ON comp.id = cm.fk_componente
 JOIN tipo_componente t ON t.id = comp.fk_tipo_componente
 JOIN metrica_componente mc ON mc.id = t.fk_metrica_componente
-ORDER BY c.dtHr;    
+ORDER BY c.dtHr;  
