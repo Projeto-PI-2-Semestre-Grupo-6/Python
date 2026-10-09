@@ -4,8 +4,7 @@ from datetime import datetime
 import mysql.connector
 from rich import print
 
-NOME_MAQUINA = "Maquína Servidor"
-EMPRESA_ID = 1
+MAQUINA_ID = 1
 
 cnx = mysql.connector.connect(user="aluno",
                               password="sptech",
@@ -14,37 +13,6 @@ cnx = mysql.connector.connect(user="aluno",
                               database="MonFire")
 
 cursor = cnx.cursor(buffered=True)
-
-
-def registrar_maquina():
-    # procura a máquina; se não existir, cadastra
-    cursor.execute("SELECT id FROM maquina WHERE nome = %s AND fk_empresa = %s",
-                   (NOME_MAQUINA, EMPRESA_ID))
-    linha = cursor.fetchone()
-
-    if linha is None:
-        cursor.execute("INSERT INTO maquina (nome, fk_empresa) VALUES (%s, %s)",
-                       (NOME_MAQUINA, EMPRESA_ID))
-        cnx.commit()
-        id_maquina = cursor.lastrowid
-        print(f"[bold green]Máquina '{NOME_MAQUINA}' cadastrada com id {id_maquina}[/bold green]")
-    else:
-        id_maquina = linha[0]
-
-    cursor.execute("""
-        INSERT INTO configuracao_maquina (fk_maquina, fk_componente)
-        SELECT %s, c.id
-        FROM componente c
-        WHERE c.id NOT IN (SELECT fk_componente
-                           FROM configuracao_maquina
-                           WHERE fk_maquina = %s)
-    """, (id_maquina, id_maquina))
-    cnx.commit()
-
-    return id_maquina
-
-
-MAQUINA_ID = registrar_maquina()
 
 ids_configuracao = {}
 
@@ -135,11 +103,10 @@ def RAM() :
 
     print(f"Memória RAM total: [bold green]{memoria_total}Gb [/bold green]")
 
-
-    if memoria_disponivel < 7 :
+    if memoria_disponivel < 5.5 :
         print(f"Alerta você só tem: [bold red]{memoria_disponivel}Gb da sua RAM dísponivel [/bold red]")
 
-    elif memoria_disponivel <= 5.5 :
+    elif memoria_disponivel < 7 :
         print(f"Alerta você só tem: [bold yellow]{memoria_disponivel}Gb da sua RAM dísponivel [/bold yellow]")
 
     else :
@@ -196,7 +163,7 @@ def Disco() :
     if espaco_utilizado >= 220 :
         print(f"Alerta você só tem [bold red]{espaco_total - espaco_utilizado}Gb do seu Disco dísponivel [/bold red]")
 
-    elif espaco_utilizado <= 5.5 :
+    elif espaco_utilizado >= 150 :
         print(f"Alerta você só tem: [bold yellow]{espaco_total - espaco_utilizado}Gb do seu Disco dísponivel [/bold yellow]")
 
     else :
@@ -216,44 +183,12 @@ def Disco() :
     print('\n')
 
 
-def Rede() :
-
-    dados_rede = p.net_io_counters()
-
-    bytes_enviados = round(dados_rede.bytes_sent / (1024**2), 2)
-    bytes_recebidos = round(dados_rede.bytes_recv / (1024**2), 2)
-
-    if bytes_recebidos >= 500 :
-        print(f"Alerta! Dados recebidos (Download): [bold red]{bytes_recebidos} MB [/bold red]")
-
-    elif bytes_recebidos >= 200 :
-        print(f"Alerta! Dados recebidos (Download): [bold yellow]{bytes_recebidos} MB [/bold yellow]")
-
-    else :
-        print(f"Dados recebidos (Download): [bold green] {bytes_recebidos} MB [/bold green]")
-
-    if bytes_enviados >= 200 :
-        print(f"Alerta! Dados enviados (Upload): [bold red]{bytes_enviados} MB [/bold red]")
-
-    elif bytes_enviados >= 100 :
-        print(f"Alerta! Dados enviados (Upload): [bold yellow]{bytes_enviados} MB [/bold yellow]")
-
-    else :
-        print(f"Dados enviados (Upload): [bold green] {bytes_enviados} MB [/bold green]")
-
-    print('\n')
-
-    banco('Rede', 'Download', bytes_recebidos)
-    banco('Rede', 'Upload', bytes_enviados)
-
-
 try:
     while True:
         CPU()
         RAM()
         Disco()
-        Rede()
-        t.sleep(5)
+        t.sleep(5   )
 finally:
     cursor.close()
     cnx.close()
